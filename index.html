@@ -10,7 +10,6 @@
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>名古屋 2026｜多人共享旅行 APP</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{--bg:#f7f4ef;--card:#fff;--ink:#252525;--muted:#777;--line:#e7e1d9;--a:#b65b45;--danger:#a33b36;--ok:#287a4c;--warn:#9a6a00}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Noto Sans TC",sans-serif;padding-bottom:82px}.wrap{max-width:760px;margin:auto}
@@ -45,12 +44,17 @@ main{padding:0 16px}.card{background:var(--card);border:1px solid var(--line);bo
 <div class="modal" id="manageModal"><div class="sheet"><h2 id="manageModalTitle">新增交通</h2><div class="field"><label id="mf1Label">名稱</label><input id="mf1"></div><div class="field"><label id="mf2Label">時間／路線</label><input id="mf2"></div><div class="field"><label>備註</label><textarea id="mf3"></textarea></div><div class="field"><label>Google Maps 地點</label><input id="mf4"></div><div class="modal-actions"><button class="btn secondary" onclick="closeManage()">取消</button><button class="btn" onclick="saveManage()">儲存</button></div></div></div>
 
 <script>
+(async()=>{try{if('serviceWorker' in navigator){const rs=await navigator.serviceWorker.getRegistrations();for(const r of rs)await r.unregister()}if('caches' in window){const ks=await caches.keys();for(const k of ks)await caches.delete(k)}}catch(e){}})();
+</script>
+<script>
 const SUPABASE_URL='https://iqjcbtagaddofoxzemkm.supabase.co';
 const SUPABASE_KEY='sb_publishable_ZDdkZ8OcYJe5EjAPyRbDKw_yTat3OC4';
 const TRIP_ID='7d6f4e8b-2a31-4c9f-9d72-6a1b5e8c3047';
 const LOCAL_KEY='nagoya_trip_v5_cache';
-const {createClient}=window.supabase;
-const supabase=createClient(SUPABASE_URL,SUPABASE_KEY);
+const API_BASE=SUPABASE_URL+'/rest/v1/trip_state';
+const API_HEADERS={apikey:SUPABASE_KEY,Authorization:'Bearer '+SUPABASE_KEY,'Content-Type':'application/json'};
+async function apiRead(){const r=await fetch(API_BASE+'?id=eq.'+TRIP_ID+'&select=data,updated_at',{headers:API_HEADERS,cache:'no-store'});const j=await r.json();if(!r.ok)throw new Error(j?.message||j?.hint||('HTTP '+r.status));return j[0]||null}
+async function apiWrite(){const r=await fetch(API_BASE+'?id=eq.'+TRIP_ID,{method:'PATCH',headers:{...API_HEADERS,Prefer:'return=representation'},body:JSON.stringify({data:state})});const j=await r.json();if(!r.ok)throw new Error(j?.message||j?.hint||('HTTP '+r.status));return j[0]||null}
 
 const DEFAULT_D=[
 ['9/29（二）','✈️ 桃園→常滑→榮','12:55 抵達後直接前往常滑，不安排長時間機場停留.',[['12:55','✈️ IT206 抵達中部國際機場','入境、領行李、海關後直接出發。','中部國際機場 セントレア'],['約14:00','🚃 NGO→りんくう常滑','先到 AEON MALL 常滑。','りんくう常滑駅'],['約14:30–16:00','🛍️ 永旺夢樂城 常滑','購物、零食、藥妝、生活用品。','AEON MALL Tokoname'],['約16:10','🚃 りんくう常滑→常滑','前往常滑市區。','常滑駅'],['約16:15–18:30','🐱 常滑陶瓷散步','陶器散步道、土管坂、招き猫、陶器店／陶藝咖啡。','常滑やきもの散歩道'],['約18:30','🚃 常滑→金山','不繞名古屋站。','金山駅 名古屋'],['約19:15','🚇 金山→矢場町','前往飯店。','矢場町駅'],['約19:30–20:00','🏨 HOTEL FORZA NAGOYA SAKAE','Check-in。晚餐自由安排。','HOTEL FORZA NAGOYA SAKAE']]],
@@ -76,18 +80,13 @@ function renderCloudNotice(){document.getElementById('cloudNotice').innerHTML='<
 function normalizeState(x){const d=defaultState();if(!x||typeof x!=='object')return d;return {itinerary:Array.isArray(x.itinerary)?x.itinerary:d.itinerary,transport:Array.isArray(x.transport)?x.transport:d.transport,tickets:Array.isArray(x.tickets)?x.tickets:d.tickets,buy:Array.isArray(x.buy)?x.buy:d.buy,eat:Array.isArray(x.eat)?x.eat:d.eat,pack:Array.isArray(x.pack)?x.pack:d.pack}}
 function loadLocal(){try{const x=JSON.parse(localStorage.getItem(LOCAL_KEY)||'null');if(x)return normalizeState(x)}catch(e){}return null}
 function cache(){try{localStorage.setItem(LOCAL_KEY,JSON.stringify(state))}catch(e){}}
-async function loadCloud(){setSync('warn','正在連線到雲端…','讀取旅行資料');const {data,error}=await supabase.from('trip_state').select('data,updated_at').eq('id',TRIP_ID).maybeSingle();if(error){console.error(error);setSync('err','雲端讀取失敗','請確認 Supabase 權限設定');state=loadLocal()||defaultState();renderAll();return}
-const cloudData=data?.data;
-if(cloudData&&Object.keys(cloudData).length){state=normalizeState(cloudData);cache();lastCloudUpdate=data.updated_at;setSync('ok','已連線・多人同步中',fmtTime(data.updated_at))}
-else{const local=loadLocal();state=local||defaultState();cache();await writeCloud(true);setSync('ok','已建立共享旅行',fmtTime(new Date().toISOString()))}
-remoteReady=true;renderAll();subscribeRealtime()}
+async function loadCloud(){setSync('warn','正在連線到雲端…','讀取旅行資料');try{const row=await apiRead();if(row&&row.data&&Object.keys(row.data).length){state=normalizeState(row.data);cache();lastCloudUpdate=row.updated_at;remoteReady=true;setSync('ok','已連線・多人同步中',fmtTime(row.updated_at));renderAll()}else{state=loadLocal()||defaultState();cache();const written=await apiWrite();lastCloudUpdate=written?.updated_at||new Date().toISOString();remoteReady=true;setSync('ok','已建立共享旅行',fmtTime(lastCloudUpdate));renderAll()}}catch(e){console.error(e);remoteReady=false;setSync('err','雲端讀取失敗',e.message||'請檢查 Supabase 權限設定');state=loadLocal()||defaultState();renderAll()}}
 function fmtTime(x){if(!x)return '';const d=new Date(x);return '最後同步 '+d.toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit',second:'2-digit'})}
-async function writeCloud(initial=false){cache();suppressRemote=true;const {data,error}=await supabase.from('trip_state').update({data:state}).eq('id',TRIP_ID).select('updated_at').single();suppressRemote=false;if(error){console.error(error);setSync('err','同步失敗','請檢查網路或 Supabase 權限');return false}lastCloudUpdate=data?.updated_at||new Date().toISOString();setSync('ok',initial?'已建立共享旅行':'已同步',fmtTime(lastCloudUpdate));return true}
+async function writeCloud(initial=false){cache();suppressRemote=true;try{const row=await apiWrite();lastCloudUpdate=row?.updated_at||new Date().toISOString();setSync('ok',initial?'已建立共享旅行':'已同步',fmtTime(lastCloudUpdate));return true}catch(e){console.error(e);setSync('err','同步失敗',e.message||'請檢查網路或 Supabase 權限');return false}finally{suppressRemote=false}}
 function scheduleSave(){cache();if(!remoteReady)return;clearTimeout(saveTimer);setSync('warn','等待同步…','');saveTimer=setTimeout(()=>writeCloud(false),350)}
 async function forceSync(){await loadCloud()}
-function subscribeRealtime(){supabase.channel('trip-state-v5').on('postgres_changes',{event:'UPDATE',schema:'public',table:'trip_state',filter:'id=eq.'+TRIP_ID},payload=>{if(suppressRemote)return;if(payload.new?.data){state=normalizeState(payload.new.data);cache();lastCloudUpdate=payload.new.updated_at;renderAll();setSync('ok','已收到其他裝置更新',fmtTime(lastCloudUpdate))}}).subscribe(status=>{if(status==='SUBSCRIBED')setSync('ok','已連線・多人同步中',lastCloudUpdate?fmtTime(lastCloudUpdate):'Realtime 已連線')})}
-function showSec(id,btn){document.querySelectorAll('.sec').forEach(x=>x.classList.remove('on'));document.getElementById('sec-'+id).classList.add('on');document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('on'));btn.classList.add('on')}
-function renderAll(){renderItinerary();renderManage('transport');renderManage('ticket');renderList('buy','buy');renderList('eat','eat');renderPack();renderCloudNotice()}
+async function pollCloud(){if(!remoteReady||suppressRemote)return;try{const row=await apiRead();if(row?.updated_at&&row.updated_at!==lastCloudUpdate&&row.data){state=normalizeState(row.data);cache();lastCloudUpdate=row.updated_at;renderAll();setSync('ok','已收到其他裝置更新',fmtTime(lastCloudUpdate))}}catch(e){console.warn('poll',e)}}
+setInterval(pollCloud,5000)
 function renderItinerary(){const tabs=document.getElementById('tabs'),content=document.getElementById('content');tabs.innerHTML='';content.innerHTML='';state.itinerary.forEach((d,i)=>{const b=document.createElement('button');b.textContent=d[0];b.type='button';b.className=i===currentDay?'on':'';b.onclick=()=>{currentDay=i;renderItinerary()};tabs.appendChild(b);if(i!==currentDay)return;const s=document.createElement('div');s.innerHTML='<div class="card hero"><h2>'+esc(d[1])+'</h2><p>'+esc(d[2])+'</p><div class="day-actions"><button class="btn secondary" onclick="editDay('+i+')">✏️ 修改今日標題</button><button class="btn secondary" onclick="addItem('+i+')">＋ 新增行程</button><button class="btn secondary" onclick="openCopy('+i+')">📋 複製整天</button></div><div class="notice">↕️ 電腦可拖曳排序；手機用 ↑↓。修改後會自動同步。</div></div>';const list=document.createElement('div');d[3].forEach((it,j)=>{const card=document.createElement('div');card.className='manage-card item-card';card.draggable=true;card.dataset.index=j;card.addEventListener('dragstart',e=>{e.dataTransfer.setData('text/plain',j);card.classList.add('dragging')});card.addEventListener('dragend',()=>card.classList.remove('dragging'));card.addEventListener('dragover',e=>e.preventDefault());card.addEventListener('drop',e=>{e.preventDefault();moveItem(i,Number(e.dataTransfer.getData('text/plain')),j)});card.innerHTML='<div class="manage-row"><span class="drag-mini">↕️</span><div class="manage-body"><div class="manage-title">'+esc(it[1])+'</div><div class="manage-meta">'+esc(it[0])+'</div><div class="manage-note">'+esc(it[2])+'</div><div class="actions">'+(it[3]?'<button class="btn" onclick="openMap('+JSON.stringify(it[3])+')">📍 Google Maps</button>':'')+'<button class="btn secondary" onclick="moveItem('+i+','+j+','+(j-1)+')">↑ 上移</button><button class="btn secondary" onclick="moveItem('+i+','+j+','+(j+1)+')">↓ 下移</button><button class="btn secondary" onclick="editItem('+i+','+j+')">✏️ 修改</button><button class="btn danger" onclick="deleteItem('+i+','+j+')">🗑️ 刪除</button></div></div></div>';list.appendChild(card)});s.appendChild(list);content.appendChild(s)})}
 function moveItem(day,from,to){const a=state.itinerary[day][3];if(from<0||to<0||from>=a.length||to>=a.length||from===to)return;const x=a.splice(from,1)[0];a.splice(to,0,x);scheduleSave();renderItinerary()}
 function addItem(day){editing={day,index:null};document.getElementById('itemModalTitle').textContent='新增行程';['if1','if2','if3','if4'].forEach(id=>document.getElementById(id).value='');document.getElementById('itemModal').classList.add('on')}
