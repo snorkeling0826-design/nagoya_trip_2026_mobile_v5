@@ -1,5 +1,4 @@
 <!doctype html>
-
 <html lang="zh-Hant">
 <head>
 <meta charset="utf-8">
@@ -22,7 +21,7 @@ main{padding:0 16px}.card{background:var(--card);border:1px solid var(--line);bo
 .nav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);display:flex;z-index:20;padding:6px 5px calc(6px + env(safe-area-inset-bottom))}.nav button{flex:1;border:0;background:none;color:#777;font-size:11px;cursor:pointer}.nav button.on{color:var(--a);font-weight:bold}.ico{display:block;font-size:20px}.sec{display:none}.sec.on{display:block}
 .manage-card{background:#fff;border:1px solid var(--line);border-radius:13px;padding:11px;margin:8px 0}.manage-row{display:flex;gap:9px;align-items:flex-start}.drag-mini{font-size:19px;color:#999;padding-top:2px;user-select:none}.manage-body{flex:1;min-width:0}.manage-title{font-weight:700}.manage-meta,.manage-note{font-size:12px;color:var(--muted);margin-top:3px;white-space:pre-wrap}.check-title{display:flex;gap:8px;align-items:center;font-weight:600}.check-title input{width:18px;height:18px}.done{text-decoration:line-through;color:#aaa}.drag-over{outline:2px dashed #c9a08f}.dragging{opacity:.55}.add{display:flex;gap:7px;margin-top:9px}.add input{flex:1;padding:10px;border:1px solid var(--line);border-radius:9px}.add button{border:0;border-radius:9px;background:var(--a);color:#fff;padding:0 15px;cursor:pointer}
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:flex-end;justify-content:center;z-index:50}.modal.on{display:flex}.sheet{background:#fff;width:100%;max-width:760px;border-radius:20px 20px 0 0;padding:18px 16px calc(22px + env(safe-area-inset-bottom));max-height:90vh;overflow:auto}.sheet h2{margin-bottom:12px}.field{margin:10px 0}.field label{display:block;font-size:13px;font-weight:700;margin-bottom:5px}.field input,.field textarea,.field select{width:100%;padding:10px;border:1px solid var(--line);border-radius:9px;font:inherit;background:#fff}.field textarea{min-height:80px;resize:vertical}.modal-actions{display:flex;gap:8px;margin-top:14px}.modal-actions button{flex:1}.small{font-size:12px;color:var(--muted)}
-.copy-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.copy-grid button{border:1px solid var(--line);background:#faf8f5;border-radius:10px;padding:11px;text-align:left}.cloud-card{background:#fff;border:1px solid var(--line);border-radius:15px;padding:14px;margin:10px 0}.code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;background:#f5f2ed;border-radius:8px;padding:8px;word-break:break-all;font-size:12px}.hide{display:none}
+.copy-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.copy-grid button{border:1px solid var(--line);background:#faf8f5;border-radius:10px;padding:11px;text-align:left}.cloud-card{background:#fff;border:1px solid var(--line);border-radius:15px;padding:14px;margin:10px 0}.code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;background:#f5f2ed;border-radius:8px;padding:8px;word-break:break-all;font-size:12px}.hide{display:none}.ticket-thumb{width:96px;height:96px;object-fit:cover;border-radius:12px;border:1px solid var(--line);background:#faf8f5}.ticket-image-row{display:flex;gap:12px;align-items:flex-start;margin-top:8px}.ticket-preview{max-width:220px;max-height:180px;border-radius:12px;border:1px solid var(--line);object-fit:contain;background:#faf8f5}.upload-box{border:1px dashed #c9a08f;border-radius:12px;padding:14px;background:#faf8f5}.qr-modal{align-items:center}.qr-sheet{border-radius:20px;max-height:94vh}.qr-title{text-align:center;margin-bottom:10px}.qr-image{display:block;max-width:100%;max-height:68vh;margin:0 auto;border-radius:12px;object-fit:contain;background:#fff}.scan-tip{text-align:center;color:var(--muted);font-size:13px;margin:12px 0}
 </style>
 </head>
 <body>
@@ -42,12 +41,12 @@ main{padding:0 16px}.card{background:var(--card);border:1px solid var(--line);bo
 <div class="modal" id="itemModal"><div class="sheet"><h2 id="itemModalTitle">新增行程</h2><div class="field"><label>時間</label><input id="if1"></div><div class="field"><label>標題</label><input id="if2"></div><div class="field"><label>說明</label><textarea id="if3"></textarea></div><div class="field"><label>Google Maps 地點</label><input id="if4" placeholder="例如：犬山城"></div><div class="modal-actions"><button class="btn secondary" onclick="closeItem()">取消</button><button class="btn" onclick="saveItem()">儲存</button></div></div></div>
 <div class="modal" id="dayModal"><div class="sheet"><h2>修改日期／標題</h2><div class="field"><label>日期</label><input id="df1"></div><div class="field"><label>標題</label><input id="df2"></div><div class="field"><label>摘要</label><textarea id="df3"></textarea></div><div class="modal-actions"><button class="btn secondary" onclick="closeDay()">取消</button><button class="btn" onclick="saveDay()">儲存</button></div></div></div>
 <div class="modal" id="copyModal"><div class="sheet"><h2>📋 複製整天到其他日期</h2><p class="small" id="copyFromText"></p><div class="copy-grid" id="copyTargets"></div><div class="modal-actions"><button class="btn secondary" onclick="closeCopy()">取消</button></div></div></div>
-<div class="modal" id="manageModal"><div class="sheet"><h2 id="manageModalTitle">新增交通</h2><div class="field"><label id="mf1Label">名稱</label><input id="mf1"></div><div class="field"><label id="mf2Label">時間／路線</label><input id="mf2"></div><div class="field"><label>備註</label><textarea id="mf3"></textarea></div><div class="field"><label>Google Maps 地點</label><input id="mf4"></div><div class="modal-actions"><button class="btn secondary" onclick="closeManage()">取消</button><button class="btn" onclick="saveManage()">儲存</button></div></div></div>
+<div class="modal" id="manageModal"><div class="sheet"><h2 id="manageModalTitle">新增交通</h2><div class="field"><label id="mf1Label">名稱</label><input id="mf1"></div><div class="field"><label id="mf2Label">時間／路線</label><input id="mf2"></div><div class="field"><label>備註</label><textarea id="mf3"></textarea></div><div class="field"><label>Google Maps 地點</label><input id="mf4"></div><div class="field" id="ticketImageField" style="display:none"><label>🎫 票券圖片／QR Code</label><div class="upload-box"><input id="ticketImageInput" type="file" accept="image/*" onchange="previewTicketImage(this)"><div class="small" style="margin-top:6px">可以上傳手機截圖或票券照片。圖片會同步到雲端。</div><div id="ticketImagePreviewWrap" style="margin-top:10px"></div><button type="button" class="btn secondary" id="removeTicketImageBtn" style="display:none" onclick="removeTicketImage()">移除目前圖片</button></div></div><div class="modal-actions"><button class="btn secondary" onclick="closeManage()">取消</button><button class="btn" onclick="saveManage()">儲存</button></div></div></div>
+<div class="modal qr-modal" id="qrModal"><div class="sheet qr-sheet"><div class="qr-title"><h2 id="qrModalTitle">🎫 出示票券</h2><div class="small" id="qrModalMeta"></div></div><img id="qrModalImage" class="qr-image" alt="票券圖片"><div class="scan-tip">請將這個畫面出示給工作人員查看／掃描</div><div class="modal-actions"><button class="btn" onclick="closeQR()">完成</button></div></div></div>
 
 <script>
 (async()=>{try{if('serviceWorker' in navigator){const rs=await navigator.serviceWorker.getRegistrations();for(const r of rs)await r.unregister()}if('caches' in window){const ks=await caches.keys();for(const k of ks)await caches.delete(k)}}catch(e){}})();
 </script>
-
 <script>
 const SUPABASE_URL='https://iqjcbtagaddofoxzemkm.supabase.co';
 const SUPABASE_KEY='sb_publishable_ZDdkZ8OcYJe5EjAPyRbDKw_yTat3OC4';
@@ -55,6 +54,8 @@ const TRIP_ID='7d6f4e8b-2a31-4c9f-9d72-6a1b5e8c3047';
 const LOCAL_KEY='nagoya_trip_v5_cache';
 const API_BASE=SUPABASE_URL+'/rest/v1/trip_state';
 const API_HEADERS={apikey:SUPABASE_KEY,Authorization:'Bearer '+SUPABASE_KEY,'Content-Type':'application/json'};
+const STORAGE_BUCKET='ticket-images';
+const STORAGE_PATH_PREFIX='nagoya_2026/tickets/';
 async function apiRead(){const r=await fetch(API_BASE+'?id=eq.'+TRIP_ID+'&select=data,updated_at',{headers:API_HEADERS,cache:'no-store'});const j=await r.json();if(!r.ok)throw new Error(j?.message||j?.hint||('HTTP '+r.status));return j[0]||null}
 async function apiWrite(){const r=await fetch(API_BASE+'?id=eq.'+TRIP_ID,{method:'PATCH',headers:{...API_HEADERS,Prefer:'return=representation'},body:JSON.stringify({data:state})});const j=await r.json();if(!r.ok)throw new Error(j?.message||j?.hint||('HTTP '+r.status));return j[0]||null}
 
@@ -103,12 +104,98 @@ function closeDay(){document.getElementById('dayModal').classList.remove('on');e
 function saveDay(){const d=state.itinerary[editing.day];d[0]=document.getElementById('df1').value.trim()||d[0];d[1]=document.getElementById('df2').value.trim()||d[1];d[2]=document.getElementById('df3').value.trim();closeDay();scheduleSave();renderItinerary()}
 function openCopy(i){copyFrom=i;document.getElementById('copyFromText').textContent='來源：'+state.itinerary[i][0]+' '+state.itinerary[i][1];const el=document.getElementById('copyTargets');el.innerHTML='';state.itinerary.forEach((d,j)=>{if(j===i)return;const b=document.createElement('button');b.textContent=d[0]+'｜'+d[1];b.onclick=()=>{if(!confirm('要把 '+state.itinerary[i][0]+' 的完整行程覆蓋到 '+d[0]+' 嗎？'))return;state.itinerary[j]=clone(state.itinerary[i]);scheduleSave();closeCopy();currentDay=j;renderItinerary()};el.appendChild(b)});document.getElementById('copyModal').classList.add('on')}
 function closeCopy(){document.getElementById('copyModal').classList.remove('on');copyFrom=null}
-function renderManage(type){const arr=type==='transport'?state.transport:state.tickets,el=document.getElementById(type==='transport'?'transportList':'ticketList');el.innerHTML='';if(!arr.length){el.innerHTML='<div class="card muted">目前沒有項目。</div>';return}arr.forEach((x,i)=>{const card=document.createElement('div');card.className='manage-card';card.draggable=true;card.addEventListener('dragstart',e=>{e.dataTransfer.setData('text/plain',i);card.classList.add('dragging')});card.addEventListener('dragend',()=>card.classList.remove('dragging'));card.addEventListener('dragover',e=>e.preventDefault());card.addEventListener('drop',e=>{e.preventDefault();moveManage(type,Number(e.dataTransfer.getData('text/plain')),i)});card.innerHTML='<div class="manage-row"><span class="drag-mini">↕️</span><div class="manage-body"><div class="manage-title">'+esc(x.t)+'</div><div class="manage-meta">'+esc(x.m)+'</div><div class="manage-note">'+esc(x.n)+'</div><div class="actions">'+(x.map?'<button class="btn" onclick="openMap('+esc(JSON.stringify(x.map))+')">📍 Google Maps</button>':'')+'<button class="btn secondary" onclick="moveManage('+esc(JSON.stringify(type))+','+i+','+(i-1)+')">↑ 上移</button><button class="btn secondary" onclick="moveManage('+esc(JSON.stringify(type))+','+i+','+(i+1)+')">↓ 下移</button><button class="btn secondary" onclick="editManage('+esc(JSON.stringify(type))+','+i+')">✏️ 修改</button><button class="btn danger" onclick="deleteManage('+esc(JSON.stringify(type))+','+i+')">🗑️ 刪除</button></div></div></div>';el.appendChild(card)})}
+function safeImageUrl(v){const s=String(v??'').trim();return /^https?:\/\//i.test(s)?s:''}
+function fileSlug(name){return String(name||'ticket').replace(/[^a-zA-Z0-9._-]+/g,'_').slice(-80)}
+async function uploadTicketImage(file){
+  if(!file)return '';
+  if(!file.type||!file.type.startsWith('image/'))throw new Error('請選擇圖片檔案');
+  const path=STORAGE_PATH_PREFIX+Date.now()+'_'+Math.random().toString(36).slice(2,8)+'_'+fileSlug(file.name);
+  const url=SUPABASE_URL+'/storage/v1/object/'+STORAGE_BUCKET+'/'+path;
+  const r=await fetch(url,{method:'POST',headers:{apikey:SUPABASE_KEY,Authorization:'Bearer '+SUPABASE_KEY,'x-upsert':'false','Content-Type':file.type},body:file});
+  if(!r.ok){let msg='圖片上傳失敗（HTTP '+r.status+'）';try{const j=await r.json();msg=j?.message||j?.error||j?.statusCode||msg}catch(e){}throw new Error(msg)}
+  return SUPABASE_URL+'/storage/v1/object/public/'+STORAGE_BUCKET+'/'+path.split('/').map(encodeURIComponent).join('/');
+}
+function previewTicketImage(input){
+  const wrap=document.getElementById('ticketImagePreviewWrap'),btn=document.getElementById('removeTicketImageBtn');
+  if(!input.files||!input.files[0])return;
+  const file=input.files[0],u=URL.createObjectURL(file);
+  wrap.innerHTML='<img class="ticket-preview" src="'+u+'" alt="預覽">';btn.style.display='inline-block';
+}
+function removeTicketImage(){
+  const input=document.getElementById('ticketImageInput'),wrap=document.getElementById('ticketImagePreviewWrap'),btn=document.getElementById('removeTicketImageBtn');
+  input.value='';wrap.innerHTML='';btn.style.display='none';
+  if(manageEditing&&manageEditing.type==='ticket'&&manageEditing.index!==null){manageEditing.removeImage=true;}
+}
+function showQR(index){
+  const x=state.tickets[index],u=safeImageUrl(x&&x.image_url);
+  if(!u)return alert('這張票券目前還沒有圖片，請先按「修改」上傳票券圖片。');
+  document.getElementById('qrModalTitle').textContent='🎫 '+(x.t||'出示票券');
+  document.getElementById('qrModalMeta').textContent=x.m||'';
+  document.getElementById('qrModalImage').src=u;
+  document.getElementById('qrModal').classList.add('on');
+}
+function closeQR(){document.getElementById('qrModal').classList.remove('on');document.getElementById('qrModalImage').src=''}
+function renderManage(type){
+  const arr=type==='transport'?state.transport:state.tickets,el=document.getElementById(type==='transport'?'transportList':'ticketList');el.innerHTML='';
+  if(!arr.length){el.innerHTML='<div class="card muted">目前沒有項目。</div>';return}
+  arr.forEach((x,i)=>{
+    const card=document.createElement('div');card.className='manage-card';card.draggable=true;
+    card.addEventListener('dragstart',e=>{e.dataTransfer.setData('text/plain',i);card.classList.add('dragging')});
+    card.addEventListener('dragend',()=>card.classList.remove('dragging'));
+    card.addEventListener('dragover',e=>e.preventDefault());
+    card.addEventListener('drop',e=>{e.preventDefault();moveManage(type,Number(e.dataTransfer.getData('text/plain')),i)});
+    const image=safeImageUrl(x.image_url);
+    const imageHtml=type==='ticket'&&image?'<div class="ticket-image-row"><img class="ticket-thumb" src="'+esc(image)+'" alt="票券圖片"><div class="small">已上傳票券圖片</div></div>':'';
+    const showBtn=type==='ticket'&&image?'<button class="btn" onclick="showQR('+i+')">🎫 出示票券</button>':'';
+    card.innerHTML='<div class="manage-row"><span class="drag-mini">↕️</span><div class="manage-body"><div class="manage-title">'+esc(x.t)+'</div><div class="manage-meta">'+esc(x.m)+'</div><div class="manage-note">'+esc(x.n)+'</div>'+imageHtml+'<div class="actions">'+(x.map?'<button class="btn" onclick="openMap('+esc(JSON.stringify(x.map))+')">📍 Google Maps</button>':'')+showBtn+'<button class="btn secondary" onclick="moveManage('+esc(JSON.stringify(type))+','+i+','+(i-1)+')">↑ 上移</button><button class="btn secondary" onclick="moveManage('+esc(JSON.stringify(type))+','+i+','+(i+1)+')">↓ 下移</button><button class="btn secondary" onclick="editManage('+esc(JSON.stringify(type))+','+i+')">✏️ 修改</button><button class="btn danger" onclick="deleteManage('+esc(JSON.stringify(type))+','+i+')">🗑️ 刪除</button></div></div></div>';
+    el.appendChild(card)
+  })
+}
+
 function moveManage(type,from,to){const a=type==='transport'?state.transport:state.tickets;if(from<0||to<0||from>=a.length||to>=a.length||from===to)return;const x=a.splice(from,1)[0];a.splice(to,0,x);scheduleSave();renderManage(type)}
-function addManage(type){manageEditing={type,index:null};document.getElementById('manageModalTitle').textContent=type==='transport'?'新增交通':'新增票券';document.getElementById('mf1Label').textContent=type==='transport'?'交通名稱':'票券名稱';document.getElementById('mf2Label').textContent=type==='transport'?'時間／路線':'日期／使用時間';['mf1','mf2','mf3','mf4'].forEach(id=>document.getElementById(id).value='');document.getElementById('manageModal').classList.add('on')}
-function editManage(type,index){const a=type==='transport'?state.transport:state.tickets,x=a[index];manageEditing={type,index};document.getElementById('manageModalTitle').textContent=type==='transport'?'修改交通':'修改票券';document.getElementById('mf1Label').textContent=type==='transport'?'交通名稱':'票券名稱';document.getElementById('mf2Label').textContent=type==='transport'?'時間／路線':'日期／使用時間';document.getElementById('mf1').value=x.t||'';document.getElementById('mf2').value=x.m||'';document.getElementById('mf3').value=x.n||'';document.getElementById('mf4').value=x.map||'';document.getElementById('manageModal').classList.add('on')}
+function addManage(type){
+  manageEditing={type,index:null,removeImage:false};
+  document.getElementById('manageModalTitle').textContent=type==='transport'?'新增交通':'新增票券';
+  document.getElementById('mf1Label').textContent=type==='transport'?'交通名稱':'票券名稱';
+  document.getElementById('mf2Label').textContent=type==='transport'?'時間／路線':'日期／使用時間';
+  ['mf1','mf2','mf3','mf4'].forEach(id=>document.getElementById(id).value='');
+  const field=document.getElementById('ticketImageField'),input=document.getElementById('ticketImageInput'),wrap=document.getElementById('ticketImagePreviewWrap'),btn=document.getElementById('removeTicketImageBtn');
+  field.style.display=type==='ticket'?'block':'none';input.value='';wrap.innerHTML='';btn.style.display='none';
+  document.getElementById('manageModal').classList.add('on')
+}
+function editManage(type,index){
+  const a=type==='transport'?state.transport:state.tickets,x=a[index];manageEditing={type,index,removeImage:false};
+  document.getElementById('manageModalTitle').textContent=type==='transport'?'修改交通':'修改票券';
+  document.getElementById('mf1Label').textContent=type==='transport'?'交通名稱':'票券名稱';
+  document.getElementById('mf2Label').textContent=type==='transport'?'時間／路線':'日期／使用時間';
+  document.getElementById('mf1').value=x.t||'';document.getElementById('mf2').value=x.m||'';document.getElementById('mf3').value=x.n||'';document.getElementById('mf4').value=x.map||'';
+  const field=document.getElementById('ticketImageField'),input=document.getElementById('ticketImageInput'),wrap=document.getElementById('ticketImagePreviewWrap'),btn=document.getElementById('removeTicketImageBtn');
+  field.style.display=type==='ticket'?'block':'none';input.value='';
+  const u=type==='ticket'?safeImageUrl(x.image_url):'';
+  wrap.innerHTML=u?'<img class="ticket-preview" src="'+esc(u)+'" alt="目前票券圖片">':'';btn.style.display=u?'inline-block':'none';
+  document.getElementById('manageModal').classList.add('on')
+}
 function closeManage(){document.getElementById('manageModal').classList.remove('on');manageEditing=null}
-function saveManage(){const x={t:document.getElementById('mf1').value.trim(),m:document.getElementById('mf2').value.trim(),n:document.getElementById('mf3').value.trim(),map:document.getElementById('mf4').value.trim()};if(!x.t)return alert('請輸入名稱');const a=manageEditing.type==='transport'?state.transport:state.tickets;if(manageEditing.index===null)a.push(x);else a[manageEditing.index]=x;const type=manageEditing.type;closeManage();scheduleSave();renderManage(type)}
+async function saveManage(){
+  const type=manageEditing.type,index=manageEditing.index;
+  const a=type==='transport'?state.transport:state.tickets;
+  const old=index===null?{}:(a[index]||{});
+  const x={t:document.getElementById('mf1').value.trim(),m:document.getElementById('mf2').value.trim(),n:document.getElementById('mf3').value.trim(),map:document.getElementById('mf4').value.trim()};
+  if(!x.t)return alert('請輸入名稱');
+  if(type==='ticket'){
+    x.image_url=old.image_url||'';
+    if(manageEditing.removeImage)x.image_url='';
+    const file=document.getElementById('ticketImageInput').files?.[0];
+    if(file){
+      const saveBtn=document.querySelector('#manageModal .modal-actions .btn:last-child');saveBtn.disabled=true;saveBtn.textContent='圖片上傳中…';
+      try{x.image_url=await uploadTicketImage(file)}catch(e){saveBtn.disabled=false;saveBtn.textContent='儲存';return alert(e.message||'圖片上傳失敗')}
+      saveBtn.disabled=false;saveBtn.textContent='儲存';
+    }
+  }
+  if(index===null)a.push(x);else a[index]=x;
+  closeManage();scheduleSave();renderManage(type)
+}
+
 function deleteManage(type,index){if(!confirm('確定要刪除這個項目嗎？'))return;(type==='transport'?state.transport:state.tickets).splice(index,1);scheduleSave();renderManage(type)}
 function renderList(which,id){const a=state[which],el=document.getElementById(id);el.innerHTML='';if(!a.length){el.innerHTML='<p class="muted">目前沒有項目。</p>';return}a.forEach((x,i)=>{const card=document.createElement('div');card.className='manage-card';card.draggable=true;card.addEventListener('dragstart',e=>{e.dataTransfer.setData('text/plain',i);card.classList.add('dragging')});card.addEventListener('dragend',()=>card.classList.remove('dragging'));card.addEventListener('dragover',e=>e.preventDefault());card.addEventListener('drop',e=>{e.preventDefault();moveList(which,Number(e.dataTransfer.getData('text/plain')),i)});card.innerHTML='<div class="manage-row"><span class="drag-mini">↕️</span><div class="manage-body"><label class="check-title"><input type="checkbox" '+(x.d?'checked':'')+' onchange="toggleList('+esc(JSON.stringify(which))+','+i+',this.checked)"><span class="'+(x.d?'done':'')+'">'+esc(x.t)+'</span></label><div class="actions"><button class="btn secondary" onclick="moveList('+esc(JSON.stringify(which))+','+i+','+(i-1)+')">↑ 上移</button><button class="btn secondary" onclick="moveList('+esc(JSON.stringify(which))+','+i+','+(i+1)+')">↓ 下移</button><button class="btn secondary" onclick="editList('+esc(JSON.stringify(which))+','+i+')">✏️ 修改</button><button class="btn danger" onclick="deleteList('+esc(JSON.stringify(which))+','+i+')">🗑️ 刪除</button></div></div></div>';el.appendChild(card)})}
 function moveList(which,from,to){const a=state[which];if(from<0||to<0||from>=a.length||to>=a.length||from===to)return;const x=a.splice(from,1)[0];a.splice(to,0,x);scheduleSave();renderList(which,which)}
@@ -125,6 +212,5 @@ function deletePack(i){if(!confirm('確定要刪除這個行李項目嗎？'))re
 
 renderCloudNotice();renderAll();loadCloud();
 </script>
-
 </body>
 </html>
